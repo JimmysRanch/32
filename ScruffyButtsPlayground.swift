@@ -1,5 +1,4 @@
 import SwiftUI
-import PlaygroundSupport
 
 struct OKLCHColor {
     let l: Double
@@ -411,4 +410,11 @@ struct Pill: View {
     }
 }
 
-PlaygroundPage.current.setLiveView(ContentView().frame(minWidth: 1200, minHeight: 900))
+@main
+struct ScruffyButtsApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
