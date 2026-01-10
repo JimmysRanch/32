@@ -6,13 +6,26 @@ struct StaffRootView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Staff")
-                        .font(.custom("Inter", size: 24).weight(.bold))
-                    Text("Manage team members and performance")
-                        .font(.custom("Inter", size: 12))
-                        .foregroundColor(Theme.mutedForeground)
+            HStack(spacing: 10) {
+                HStack(spacing: 10) {
+                    ForEach(StaffSubTab.allCases) { tab in
+                        let isActive = tab == selectedTab
+                        Button(action: {
+                            selectedTab = tab
+                            if tab != .staffList {
+                                showProfile = false
+                            }
+                        }) {
+                            Text(tab.rawValue)
+                                .font(.custom("Inter", size: 12).weight(.semibold))
+                                .foregroundColor(isActive ? Theme.primaryForeground : Theme.foreground)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 16)
+                                .background(isActive ? Theme.primary : Theme.muted)
+                                .cornerRadius(999)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
                 Spacer()
                 Button(action: {}) {
@@ -23,33 +36,11 @@ struct StaffRootView: View {
                             .font(.custom("Inter", size: 12).weight(.semibold))
                     }
                     .padding(.vertical, 8)
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 14)
                     .background(Theme.primary)
                     .foregroundColor(Theme.primaryForeground)
                     .cornerRadius(10)
                 }
-            }
-
-            HStack(spacing: 10) {
-                ForEach(StaffSubTab.allCases) { tab in
-                    let isActive = tab == selectedTab
-                    Button(action: {
-                        selectedTab = tab
-                        if tab != .staffList {
-                            showProfile = false
-                        }
-                    }) {
-                        Text(tab.rawValue)
-                            .font(.custom("Inter", size: 12).weight(.semibold))
-                            .foregroundColor(isActive ? Theme.primaryForeground : Theme.foreground)
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 16)
-                            .background(isActive ? Theme.primary : Theme.muted)
-                            .cornerRadius(999)
-                    }
-                    .buttonStyle(.plain)
-                }
-                Spacer()
             }
 
             switch selectedTab {

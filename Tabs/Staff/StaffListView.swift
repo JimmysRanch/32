@@ -25,8 +25,8 @@ struct StaffListView: View {
                                     PillBadge(text: staff.status, tint: staff.statusTint)
                                 }
                                 HStack(spacing: 14) {
-                                    Label(staff.email, systemImage: "envelope")
-                                    Label(staff.phone, systemImage: "phone")
+                                    Text(staff.email)
+                                    Text(staff.phone)
                                 }
                                 .font(.custom("Inter", size: 11))
                                 .foregroundColor(Theme.mutedForeground)
