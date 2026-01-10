@@ -58,7 +58,7 @@ struct DashboardView: View {
     var body: some View {
         GeometryReader { geometry in
             let spacing: CGFloat = 12
-            let availableHeight = geometry.size.height - (spacing * 2)
+            let availableHeight = geometry.size.height - (spacing * 3)
             let rowHeight = max(0, availableHeight / 3)
 
             Grid(horizontalSpacing: spacing, verticalSpacing: spacing) {
@@ -92,6 +92,7 @@ struct DashboardView: View {
                         .frame(height: rowHeight)
                 }
             }
+            .padding(.top, spacing)
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
