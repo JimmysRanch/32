@@ -44,6 +44,10 @@ struct OutlinePill: View {
             .padding(.horizontal, 10)
             .background(
                 RoundedRectangle(cornerRadius: 999)
+                    .fill(Theme.background.opacity(0.6))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 999)
                     .stroke(Theme.border, lineWidth: 1)
             )
     }
@@ -81,7 +85,7 @@ struct StaffStatBlock: View {
                 .font(.custom("Inter", size: 10).weight(.semibold))
                 .foregroundColor(Theme.mutedForeground)
             Text(value)
-                .font(.custom("Inter", size: 12).weight(.semibold))
+                .font(.custom("Inter", size: 13).weight(.semibold))
         }
         .frame(minWidth: 70, alignment: .trailing)
     }

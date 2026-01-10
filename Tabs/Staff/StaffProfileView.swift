@@ -30,7 +30,7 @@ struct StaffProfileView: View {
                     .foregroundColor(Theme.mutedForeground)
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Sarah Johnson")
-                        .font(.custom("Inter", size: 22).weight(.bold))
+                        .font(.custom("Inter", size: 24).weight(.bold))
                     HStack(spacing: 8) {
                         Text("Senior Groomer")
                             .font(.custom("Inter", size: 12).weight(.semibold))
@@ -52,6 +52,10 @@ struct StaffProfileView: View {
                         .background(Theme.muted)
                         .cornerRadius(10)
                 }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Theme.border, lineWidth: 1)
+                )
                 Button(action: {}) {
                     Image(systemName: "pencil")
                         .font(.system(size: 12, weight: .semibold))
@@ -59,6 +63,10 @@ struct StaffProfileView: View {
                         .background(Theme.muted)
                         .cornerRadius(8)
                 }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Theme.border, lineWidth: 1)
+                )
             }
 
             HStack(spacing: 10) {
@@ -73,7 +81,7 @@ struct StaffProfileView: View {
                             .padding(.vertical, 8)
                             .padding(.horizontal, 14)
                             .background(isActive ? Theme.primary : Theme.muted)
-                            .cornerRadius(8)
+                            .cornerRadius(999)
                     }
                     .buttonStyle(.plain)
                 }
