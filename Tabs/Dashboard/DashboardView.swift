@@ -57,11 +57,9 @@ struct DashboardView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let spacing: CGFloat = 10
-            let horizontalPadding: CGFloat = 12
-            let verticalPadding: CGFloat = 12
-            let availableHeight = geometry.size.height - (verticalPadding * 2) - (spacing * 2)
-            let rowHeight = max(120, availableHeight / 3)
+            let spacing: CGFloat = 12
+            let availableHeight = geometry.size.height - (spacing * 2)
+            let rowHeight = max(0, availableHeight / 3)
 
             Grid(horizontalSpacing: spacing, verticalSpacing: spacing) {
                 GridRow {
@@ -94,11 +92,9 @@ struct DashboardView: View {
                         .frame(height: rowHeight)
                 }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, horizontalPadding)
-            .padding(.vertical, verticalPadding)
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
-        .frame(minHeight: 520)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -177,7 +173,7 @@ struct BookedRingCard: View {
             GeometryReader { geometry in
                 let ringSize = min(geometry.size.width, geometry.size.height) * 0.6
                 VStack(alignment: .center, spacing: 6) {
-                    RingProgress(progress: progress, size: max(80, ringSize))
+                    RingProgress(progress: progress, size: ringSize)
                     Text("Today")
                         .font(.custom("Inter", size: 12))
                         .foregroundColor(Theme.mutedForeground)

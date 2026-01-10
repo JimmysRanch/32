@@ -10,33 +10,38 @@ struct ContentView: View {
 
             VStack(spacing: 0) {
                 TopNav(selectedTab: $selectedTab)
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 20) {
-                        switch selectedTab {
-                        case .dashboard:
-                            DashboardView()
-                        case .staff:
-                            StaffRootView()
-                        case .finances:
-                            FinancesRootView()
-                        case .settings:
-                            SettingsRootView()
-                        case .appointments:
-                            ComingSoonView(title: "Appointments")
-                        case .messages:
-                            ComingSoonView(title: "Messages")
-                        case .clients:
-                            ComingSoonView(title: "Clients")
-                        case .pos:
-                            ComingSoonView(title: "POS")
-                        case .inventory:
-                            ComingSoonView(title: "Inventory")
-                        case .reports:
-                            ComingSoonView(title: "Reports")
+                if selectedTab == .dashboard {
+                    DashboardView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 20) {
+                            switch selectedTab {
+                            case .dashboard:
+                                DashboardView()
+                            case .staff:
+                                StaffRootView()
+                            case .finances:
+                                FinancesRootView()
+                            case .settings:
+                                SettingsRootView()
+                            case .appointments:
+                                ComingSoonView(title: "Appointments")
+                            case .messages:
+                                ComingSoonView(title: "Messages")
+                            case .clients:
+                                ComingSoonView(title: "Clients")
+                            case .pos:
+                                ComingSoonView(title: "POS")
+                            case .inventory:
+                                ComingSoonView(title: "Inventory")
+                            case .reports:
+                                ComingSoonView(title: "Reports")
+                            }
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 16)
                 }
             }
         }
