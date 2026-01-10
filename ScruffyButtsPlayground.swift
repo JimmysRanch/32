@@ -47,11 +47,13 @@ enum Theme {
     static let muted = OKLCHColor(l: 0.25, c: 0.04, h: 250).toColor()
     static let mutedForeground = OKLCHColor(l: 0.65, c: 0.02, h: 250).toColor()
     static let border = OKLCHColor(l: 0.35, c: 0.05, h: 250).toColor()
-    static let destructive = OKLCHColor(l: 0.55, c: 0.22, h: 25).toColor()
     static let success = OKLCHColor(l: 0.74, c: 0.18, h: 145).toColor()
     static let warning = OKLCHColor(l: 0.72, c: 0.18, h: 70).toColor()
-    static let alert = OKLCHColor(l: 0.72, c: 0.14, h: 30).toColor()
-    static let magenta = OKLCHColor(l: 0.68, c: 0.22, h: 320).toColor()
+}
+
+enum StaffScreen: String, CaseIterable {
+    case list = "Staff List"
+    case profile = "Staff Profile"
 }
 
 struct TabItem: Identifiable {
@@ -60,74 +62,50 @@ struct TabItem: Identifiable {
     let isActive: Bool
 }
 
-struct AppointmentSummaryItem: Identifiable {
-    let id = UUID()
-    let label: String
-    let value: String
-    let color: Color
-}
-
-struct IssueItem: Identifiable {
-    let id = UUID()
-    let label: String
-    let count: String
-    let tint: Color
-}
-
-struct ActivityItem: Identifiable {
-    let id = UUID()
-    let title: String
-    let subtitle: String
-    let time: String
-    let icon: String
-    let iconTint: Color
-}
-
-struct GroomerWorkload: Identifiable {
+struct StaffMember: Identifiable {
     let id = UUID()
     let name: String
+    let role: String
+    let status: String
+    let email: String
+    let phone: String
+    let tags: [String]
+    let rate: String
     let appointments: String
-    let minutes: String
-    let progress: Double
-    let tint: Color
+    let hired: String
+    let statusTint: Color
 }
 
-struct GroomerAverage: Identifiable {
-    let id = UUID()
-    let name: String
-    let dogsPerDay: String
-    let revenue: String
-    let tint: Color
-}
-
-struct ExpenseItem: Identifiable {
-    let id = UUID()
-    let title: String
-    let amount: String
-    let percent: String
-    let tint: Color
-}
-
-struct BookedMetric: Identifiable {
-    let id = UUID()
-    let label: String
-    let value: String
-    let progress: Double
-}
-
-struct ClientMetric: Identifiable {
+struct StaffMetric: Identifiable {
     let id = UUID()
     let title: String
     let value: String
+    let subtitle: String?
+}
+
+struct AppointmentRow: Identifiable {
+    let id = UUID()
+    let clientName: String
+    let petName: String
+    let status: String
+    let statusTint: Color
+    let service: String
+    let date: String
+    let time: String
+    let duration: String
+    let rating: String?
+    let amount: String?
 }
 
 struct ContentView: View {
+    @State private var screen: StaffScreen = .list
+
     private let tabs: [TabItem] = [
-        TabItem(title: "Dashboard", isActive: true),
+        TabItem(title: "Dashboard", isActive: false),
         TabItem(title: "Appointments", isActive: false),
         TabItem(title: "Messages", isActive: false),
         TabItem(title: "Clients", isActive: false),
-        TabItem(title: "Staff", isActive: false),
+        TabItem(title: "Staff", isActive: true),
         TabItem(title: "POS", isActive: false),
         TabItem(title: "Inventory", isActive: false),
         TabItem(title: "Finances", isActive: false),
@@ -135,117 +113,36 @@ struct ContentView: View {
         TabItem(title: "Settings", isActive: false)
     ]
 
-    private let appointmentSummary: [AppointmentSummaryItem] = [
-        AppointmentSummaryItem(label: "Scheduled", value: "18", color: Theme.primary),
-        AppointmentSummaryItem(label: "Completed", value: "12", color: Theme.success),
-        AppointmentSummaryItem(label: "Canceled", value: "2", color: Theme.destructive),
-        AppointmentSummaryItem(label: "No-Shows", value: "1", color: Theme.warning),
-        AppointmentSummaryItem(label: "Late", value: "3", color: Theme.alert)
-    ]
-
-    private let issues: [IssueItem] = [
-        IssueItem(label: "Late arrivals", count: "3", tint: Theme.alert),
-        IssueItem(label: "No-shows", count: "1", tint: Theme.warning),
-        IssueItem(label: "Canceled", count: "2", tint: Theme.destructive)
-    ]
-
-    private let activities: [ActivityItem] = [
-        ActivityItem(title: "New appointment booked for Max", subtitle: "John Smith", time: "2 minutes ago", icon: "calendar", iconTint: Theme.primary),
-        ActivityItem(title: "Appointment canceled for Luna", subtitle: "Sarah Williams", time: "15 minutes ago", icon: "xmark.circle", iconTint: Theme.destructive),
-        ActivityItem(title: "New appointment booked for Charlie", subtitle: "Mike Johnson", time: "1 hour ago", icon: "calendar", iconTint: Theme.primary),
-        ActivityItem(title: "Service price updated: Full Groom", subtitle: "Pricing", time: "3 hours ago", icon: "dollarsign.circle", iconTint: Theme.warning)
-    ]
-
-    private let workloads: [GroomerWorkload] = [
-        GroomerWorkload(name: "Sarah Johnson", appointments: "8 appointments", minutes: "456/480 min", progress: 0.95, tint: Theme.magenta),
-        GroomerWorkload(name: "Mike Chen", appointments: "6 appointments", minutes: "374/480 min", progress: 0.78, tint: Theme.primary),
-        GroomerWorkload(name: "Emily Rodriguez", appointments: "7 appointments", minutes: "422/480 min", progress: 0.88, tint: Theme.success)
-    ]
-
-    private let averages: [GroomerAverage] = [
-        GroomerAverage(name: "Sarah Johnson", dogsPerDay: "8", revenue: "$646", tint: Theme.magenta),
-        GroomerAverage(name: "Mike Chen", dogsPerDay: "6", revenue: "$398", tint: Theme.primary),
-        GroomerAverage(name: "Emily Rodriguez", dogsPerDay: "7", revenue: "$524", tint: Theme.success)
-    ]
-
-    private let expenses: [ExpenseItem] = [
-        ExpenseItem(title: "Payroll", amount: "$4,200", percent: "42.0%", tint: Theme.primary),
-        ExpenseItem(title: "Rent", amount: "$2,500", percent: "25.0%", tint: Theme.magenta),
-        ExpenseItem(title: "Supplies", amount: "$1,850", percent: "18.5%", tint: Theme.success),
-        ExpenseItem(title: "Marketing", amount: "$800", percent: "8.0%", tint: Theme.destructive),
-        ExpenseItem(title: "Utilities", amount: "$650", percent: "6.5%", tint: Theme.warning)
-    ]
-
-    private let bookedMetrics: [BookedMetric] = [
-        BookedMetric(label: "Day", value: "82%", progress: 0.82),
-        BookedMetric(label: "Week", value: "78%", progress: 0.78),
-        BookedMetric(label: "Month", value: "73%", progress: 0.73)
-    ]
-
-    private let clientMetrics: [ClientMetric] = [
-        ClientMetric(title: "Total Clients", value: "156"),
-        ClientMetric(title: "New This Month", value: "12"),
-        ClientMetric(title: "Repeat Rate", value: "78%"),
-        ClientMetric(title: "Avg Rebooking", value: "28")
-    ]
-
     var body: some View {
-        GeometryReader { geometry in
-            let spacing: CGFloat = 10
-            let horizontalPadding: CGFloat = 12
-            let verticalPadding: CGFloat = 12
-            let topNavHeight: CGFloat = 44
-            let availableHeight = geometry.size.height - topNavHeight - (verticalPadding * 2) - (spacing * 2)
-            let rowHeight = max(120, availableHeight / 3)
+        ZStack {
+            Theme.background
+                .ignoresSafeArea()
 
-            ZStack {
-                Theme.background
-                    .ignoresSafeArea()
+            VStack(spacing: 0) {
+                TopNav(tabs: tabs)
+                Picker("Screen", selection: $screen) {
+                    ForEach(StaffScreen.allCases, id: \.self) { item in
+                        Text(item.rawValue)
+                            .tag(item)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 8)
 
-                VStack(spacing: 0) {
-                    TopNav(tabs: tabs)
-                        .frame(height: topNavHeight)
-
-                    Grid(horizontalSpacing: spacing, verticalSpacing: spacing) {
-                        GridRow {
-                            AppointmentSummaryCard(items: appointmentSummary, progress: 12, total: 18)
-                                .frame(height: rowHeight)
-                            BookedRingCard(progress: 0.82)
-                                .frame(height: rowHeight)
-                            ExpectedRevenueCard()
-                                .frame(height: rowHeight)
-                            IssuesCard(items: issues)
-                                .frame(height: rowHeight)
-                        }
-                        GridRow {
-                            RecentActivityCard(items: activities)
-                                .gridCellColumns(2)
-                                .frame(height: rowHeight)
-                            GroomerWorkloadCard(workloads: workloads)
-                                .frame(height: rowHeight)
-                            GroomerAverageCard(averages: averages)
-                                .frame(height: rowHeight)
-                        }
-                        GridRow {
-                            ExpensesCard(items: expenses)
-                                .frame(height: rowHeight)
-                            CompletedAppointmentsCard()
-                                .frame(height: rowHeight)
-                            BookedCapacityCard(items: bookedMetrics)
-                                .frame(height: rowHeight)
-                            ClientsCard(items: clientMetrics)
-                                .frame(height: rowHeight)
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 20) {
+                        if screen == .list {
+                            StaffListView()
+                        } else {
+                            StaffProfileView()
                         }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.horizontal, horizontalPadding)
-                    .padding(.vertical, verticalPadding)
-                    .background(Theme.background)
-                    .gridCellUnsizedAxes(.horizontal)
-                    .environment(\.layoutDirection, .leftToRight)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 16)
                 }
             }
-            .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .font(.custom("Inter", size: 14))
         .foregroundColor(Theme.foreground)
@@ -282,432 +179,344 @@ struct TopNav: View {
     }
 }
 
-struct DashboardCardContainer<Content: View>: View {
+struct SectionHeader: View {
     let title: String
-    let isUppercase: Bool
+
+    var body: some View {
+        Text(title.uppercased())
+            .font(.custom("Inter", size: 11).weight(.semibold))
+            .foregroundColor(Theme.mutedForeground)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+struct PillBadge: View {
+    let text: String
+    let tint: Color
+    let textColor: Color
+
+    init(text: String, tint: Color, textColor: Color = Theme.primaryForeground) {
+        self.text = text
+        self.tint = tint
+        self.textColor = textColor
+    }
+
+    var body: some View {
+        Text(text)
+            .font(.custom("Inter", size: 11).weight(.semibold))
+            .foregroundColor(textColor)
+            .padding(.vertical, 4)
+            .padding(.horizontal, 10)
+            .background(tint)
+            .cornerRadius(999)
+    }
+}
+
+struct OutlinePill: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.custom("Inter", size: 11).weight(.medium))
+            .foregroundColor(Theme.mutedForeground)
+            .padding(.vertical, 4)
+            .padding(.horizontal, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 999)
+                    .stroke(Theme.border, lineWidth: 1)
+            )
+    }
+}
+
+struct CardContainer<Content: View>: View {
     let content: Content
 
-    init(title: String, isUppercase: Bool = false, @ViewBuilder content: () -> Content) {
-        self.title = title
-        self.isUppercase = isUppercase
+    init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(isUppercase ? title.uppercased() : title)
-                .font(.custom("Inter", size: isUppercase ? 11 : 14).weight(.semibold))
-                .foregroundColor(isUppercase ? Theme.mutedForeground : Theme.foreground)
             content
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(16)
+        .frame(maxWidth: .infinity)
         .background(Theme.card)
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 14)
                 .stroke(Theme.border, lineWidth: 1)
         )
-        .cornerRadius(12)
-        .clipped()
+        .cornerRadius(14)
     }
 }
 
-struct AppointmentSummaryCard: View {
-    let items: [AppointmentSummaryItem]
-    let progress: Int
-    let total: Int
+struct StaffListView: View {
+    private let listTabs = ["Staff List", "Schedule", "Payroll", "Performance"]
+
+    private let staffMembers: [StaffMember] = [
+        StaffMember(name: "Sarah Johnson", role: "Senior Groomer", status: "Active", email: "sarah.j@pawhub.com", phone: "(555) 123-4567", tags: ["Large Breeds", "Show Cuts", "Hand Stripping"], rate: "$35/hr", appointments: "324", hired: "Mar 15, 2022", statusTint: Theme.primary),
+        StaffMember(name: "Mike Torres", role: "Groomer", status: "Active", email: "mike.t@pawhub.com", phone: "(555) 234-5678", tags: ["Anxious Dogs", "Creative Styling", "Nail Care"], rate: "$28/hr", appointments: "256", hired: "Aug 20, 2022", statusTint: Theme.primary),
+        StaffMember(name: "Emma Roberts", role: "Spa Specialist", status: "Active", email: "emma.r@pawhub.com", phone: "(555) 345-6789", tags: ["Spa Treatments", "Small Breeds", "Facials"], rate: "$32/hr", appointments: "198", hired: "Jan 10, 2023", statusTint: Theme.primary),
+        StaffMember(name: "Carlos Martinez", role: "Bather", status: "Active", email: "carlos.m@pawhub.com", phone: "(555) 456-7890", tags: ["De-shedding", "Quick Service", "Puppy Care"], rate: "$22/hr", appointments: "412", hired: "May 5, 2023", statusTint: Theme.primary),
+        StaffMember(name: "Lisa Chen", role: "Groomer", status: "On Leave", email: "lisa.c@pawhub.com", phone: "(555) 567-8901", tags: ["Poodle Cuts", "Color & Styling", "Competition Prep"], rate: "$30/hr", appointments: "187", hired: "Nov 12, 2023", statusTint: Theme.secondary)
+    ]
 
     var body: some View {
-        DashboardCardContainer(title: "Appointments Today", isUppercase: true) {
-            VStack(alignment: .leading, spacing: 10) {
-                ForEach(items) { item in
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(item.color)
-                            .frame(width: 6, height: 6)
-                        Text(item.label)
-                            .font(.custom("Inter", size: 12))
-                            .foregroundColor(Theme.mutedForeground)
-                        Spacer()
-                        Text(item.value)
+        VStack(spacing: 16) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Staff")
+                        .font(.custom("Inter", size: 24).weight(.bold))
+                    Text("Manage team members and performance")
+                        .font(.custom("Inter", size: 12))
+                        .foregroundColor(Theme.mutedForeground)
+                }
+                Spacer()
+                Button(action: {}) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 12, weight: .bold))
+                        Text("Add Staff Member")
                             .font(.custom("Inter", size: 12).weight(.semibold))
                     }
-                }
-                Text("Day Progress")
-                    .font(.custom("Inter", size: 11))
-                    .foregroundColor(Theme.mutedForeground)
-                ProgressBar(progress: Double(progress) / Double(total), tint: Theme.primary)
-                HStack {
-                    Spacer()
-                    Text("\(progress) / \(total)")
-                        .font(.custom("Inter", size: 11))
-                        .foregroundColor(Theme.mutedForeground)
-                }
-            }
-            .frame(maxHeight: .infinity, alignment: .topLeading)
-        }
-    }
-}
-
-struct BookedRingCard: View {
-    let progress: Double
-
-    var body: some View {
-        DashboardCardContainer(title: "Booked", isUppercase: true) {
-            GeometryReader { geometry in
-                let ringSize = min(geometry.size.width, geometry.size.height) * 0.6
-                VStack(alignment: .center, spacing: 6) {
-                RingProgress(progress: progress, size: max(80, ringSize))
-                    Text("Today")
-                        .font(.custom("Inter", size: 12))
-                        .foregroundColor(Theme.mutedForeground)
-                    Text("Target 90%")
-                        .font(.custom("Inter", size: 11))
-                        .foregroundColor(Theme.mutedForeground)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .frame(maxHeight: .infinity)
-        }
-    }
-}
-
-struct RingProgress: View {
-    let progress: Double
-    let size: CGFloat
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(Theme.muted, lineWidth: max(6, size * 0.08))
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(
-                    AngularGradient(
-                        gradient: Gradient(colors: [Theme.success, Theme.primary, Theme.warning]),
-                        center: .center
-                    ),
-                    style: StrokeStyle(lineWidth: max(6, size * 0.08), lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
-            Text("\(Int(progress * 100))%")
-                .font(.custom("Inter", size: max(16, size * 0.25)).weight(.bold))
-        }
-        .frame(width: size, height: size)
-    }
-}
-
-struct ExpectedRevenueCard: View {
-    var body: some View {
-        DashboardCardContainer(title: "Expected Revenue", isUppercase: true) {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("$1450")
-                    .font(.custom("Inter", size: 22).weight(.bold))
-                Text("Total Revenue Today")
-                    .font(.custom("Inter", size: 12))
-                    .foregroundColor(Theme.mutedForeground)
-                DividerLine()
-                HStack {
-                    Text("Profit After Commissions")
-                        .font(.custom("Inter", size: 12))
-                        .foregroundColor(Theme.mutedForeground)
-                    Spacer()
-                    Text("$1160")
-                        .font(.custom("Inter", size: 12).weight(.semibold))
-                        .foregroundColor(Theme.success)
-                }
-                HStack {
-                    Text("Tips (excluded)")
-                        .font(.custom("Inter", size: 12))
-                        .foregroundColor(Theme.mutedForeground)
-                    Spacer()
-                    Text("$145")
-                        .font(.custom("Inter", size: 12).weight(.semibold))
-                }
-                HStack {
-                    Text("Commission estimate")
-                        .font(.custom("Inter", size: 12))
-                        .foregroundColor(Theme.mutedForeground)
-                    Spacer()
-                    Text("$290")
-                        .font(.custom("Inter", size: 12).weight(.semibold))
-                }
-            }
-            .frame(maxHeight: .infinity, alignment: .topLeading)
-        }
-    }
-}
-
-struct IssuesCard: View {
-    let items: [IssueItem]
-
-    var body: some View {
-        DashboardCardContainer(title: "Issues", isUppercase: true) {
-            VStack(spacing: 10) {
-                ForEach(items) { item in
-                    HStack {
-                        Circle()
-                            .fill(item.tint)
-                            .frame(width: 8, height: 8)
-                        Text(item.label)
-                            .font(.custom("Inter", size: 12))
-                        Spacer()
-                        Text(item.count)
-                            .font(.custom("Inter", size: 12).weight(.semibold))
-                    }
-                    .padding(10)
-                    .background(item.tint.opacity(0.15))
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(Theme.primary)
+                    .foregroundColor(Theme.primaryForeground)
                     .cornerRadius(10)
                 }
             }
-            .frame(maxHeight: .infinity, alignment: .topLeading)
+
+            HStack(spacing: 10) {
+                ForEach(listTabs, id: \.self) { tab in
+                    let isActive = tab == "Staff List"
+                    Text(tab)
+                        .font(.custom("Inter", size: 12).weight(.semibold))
+                        .foregroundColor(isActive ? Theme.primaryForeground : Theme.foreground)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 16)
+                        .background(isActive ? Theme.primary : Theme.muted)
+                        .cornerRadius(999)
+                }
+                Spacer()
+            }
+
+            VStack(spacing: 14) {
+                ForEach(staffMembers) { staff in
+                    CardContainer {
+                        HStack(alignment: .top, spacing: 16) {
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack(spacing: 10) {
+                                    Text(staff.name)
+                                        .font(.custom("Inter", size: 16).weight(.semibold))
+                                    OutlinePill(text: staff.role)
+                                    PillBadge(text: staff.status, tint: staff.statusTint)
+                                }
+                                HStack(spacing: 14) {
+                                    Label(staff.email, systemImage: "envelope")
+                                    Label(staff.phone, systemImage: "phone")
+                                }
+                                .font(.custom("Inter", size: 11))
+                                .foregroundColor(Theme.mutedForeground)
+
+                                HStack(spacing: 8) {
+                                    ForEach(staff.tags, id: \.self) { tag in
+                                        OutlinePill(text: tag)
+                                    }
+                                }
+                            }
+
+                            Spacer()
+
+                            HStack(spacing: 26) {
+                                StaffStatBlock(title: "Rate", value: staff.rate)
+                                StaffStatBlock(title: "Appointments", value: staff.appointments)
+                                StaffStatBlock(title: "Hired", value: staff.hired)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-struct RecentActivityCard: View {
-    let items: [ActivityItem]
+struct StaffStatBlock: View {
+    let title: String
+    let value: String
 
     var body: some View {
-        DashboardCardContainer(title: "Recent Activity") {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 8) {
-                    ForEach(items) { item in
-                        HStack(spacing: 10) {
-                            Image(systemName: item.icon)
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(item.iconTint)
-                                .frame(width: 24, height: 24)
-                                .background(Theme.muted)
-                                .cornerRadius(6)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(item.title)
-                                    .font(.custom("Inter", size: 12).weight(.semibold))
-                                Text(item.subtitle)
+        VStack(alignment: .trailing, spacing: 4) {
+            Text(title.uppercased())
+                .font(.custom("Inter", size: 10).weight(.semibold))
+                .foregroundColor(Theme.mutedForeground)
+            Text(value)
+                .font(.custom("Inter", size: 12).weight(.semibold))
+        }
+        .frame(minWidth: 70, alignment: .trailing)
+    }
+}
+
+struct StaffProfileView: View {
+    private let summaryMetrics: [StaffMetric] = [
+        StaffMetric(title: "Total Appts", value: "324", subtitle: "Completion Rate 98%"),
+        StaffMetric(title: "Revenue", value: "$45,280", subtitle: "Avg Tip $28"),
+        StaffMetric(title: "Avg Rating", value: "4.9", subtitle: "Hourly Rate $35/hr"),
+        StaffMetric(title: "No-shows", value: "3", subtitle: "Cancels 8"),
+        StaffMetric(title: "Late", value: "2", subtitle: nil)
+    ]
+
+    private let upcomingAppointments: [AppointmentRow] = [
+        AppointmentRow(clientName: "George Moodys", petName: "Trying", status: "Confirmed", statusTint: Theme.primary, service: "Full Groom Package", date: "Jan 28, 2025", time: "9:00 AM", duration: "2h", rating: nil, amount: nil),
+        AppointmentRow(clientName: "Sarah Johnson", petName: "Bella", status: "Confirmed", statusTint: Theme.primary, service: "Bath & Brush", date: "Jan 28, 2025", time: "11:30 AM", duration: "1h", rating: nil, amount: nil),
+        AppointmentRow(clientName: "Michael Chen", petName: "Charlie", status: "Pending", statusTint: Theme.muted, service: "Nail Trim", date: "Jan 28, 2025", time: "2:00 PM", duration: "30m", rating: nil, amount: nil)
+    ]
+
+    private let recentAppointments: [AppointmentRow] = [
+        AppointmentRow(clientName: "George Moodys", petName: "Trying", status: "5", statusTint: Theme.warning, service: "Full Groom Package", date: "Jan 15, 2025", time: "9:00 AM", duration: "", rating: "Client very happy with the cut!", amount: "$85 + $45 tip"),
+        AppointmentRow(clientName: "Emily Rodriguez", petName: "Rocky", status: "5", statusTint: Theme.warning, service: "Bath & Brush", date: "Jan 14, 2025", time: "1:30 PM", duration: "", rating: "Rocky was well-behaved today.", amount: "$55 + $20 tip"),
+        AppointmentRow(clientName: "David Thompson", petName: "Coco", status: "5", statusTint: Theme.warning, service: "Luxury Spa Package", date: "Jan 12, 2025", time: "10:00 AM", duration: "", rating: "Perfect spa day!", amount: "$120 + $35 tip")
+    ]
+
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: "chevron.left")
+                    .foregroundColor(Theme.mutedForeground)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Sarah Johnson")
+                        .font(.custom("Inter", size: 22).weight(.bold))
+                    HStack(spacing: 8) {
+                        Text("Senior Groomer")
+                            .font(.custom("Inter", size: 12).weight(.semibold))
+                            .foregroundColor(Theme.mutedForeground)
+                        Text("•")
+                            .foregroundColor(Theme.mutedForeground)
+                        Text("Since Mar 15, 2022")
+                            .font(.custom("Inter", size: 12))
+                            .foregroundColor(Theme.mutedForeground)
+                        PillBadge(text: "Active", tint: Theme.primary)
+                    }
+                }
+                Spacer()
+                Button(action: {}) {
+                    Text("Contact")
+                        .font(.custom("Inter", size: 12).weight(.semibold))
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 16)
+                        .background(Theme.muted)
+                        .cornerRadius(10)
+                }
+                Button(action: {}) {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 12, weight: .semibold))
+                        .padding(8)
+                        .background(Theme.muted)
+                        .cornerRadius(8)
+                }
+            }
+
+            HStack(spacing: 10) {
+                ForEach(["Overview", "Payroll", "Schedule", "History"], id: \.self) { tab in
+                    let isActive = tab == "Overview"
+                    Text(tab)
+                        .font(.custom("Inter", size: 12).weight(.semibold))
+                        .foregroundColor(isActive ? Theme.primaryForeground : Theme.foreground)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 14)
+                        .background(isActive ? Theme.primary : Theme.muted)
+                        .cornerRadius(8)
+                }
+                Spacer()
+            }
+
+            HStack(spacing: 12) {
+                ForEach(summaryMetrics) { metric in
+                    CardContainer {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(metric.title.uppercased())
+                                .font(.custom("Inter", size: 10).weight(.semibold))
+                                .foregroundColor(Theme.mutedForeground)
+                            Text(metric.value)
+                                .font(.custom("Inter", size: 18).weight(.bold))
+                            if let subtitle = metric.subtitle {
+                                Text(subtitle)
                                     .font(.custom("Inter", size: 11))
                                     .foregroundColor(Theme.mutedForeground)
                             }
-                            Spacer()
-                            Text(item.time)
-                                .font(.custom("Inter", size: 11))
-                                .foregroundColor(Theme.mutedForeground)
-                        }
-                        .padding(8)
-                        .background(Theme.muted.opacity(0.6))
-                        .cornerRadius(10)
-                    }
-                }
-            }
-            .frame(maxHeight: .infinity)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct GroomerWorkloadCard: View {
-    let workloads: [GroomerWorkload]
-
-    var body: some View {
-        DashboardCardContainer(title: "Groomers Workload") {
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(workloads) { workload in
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            Text(workload.name)
-                                .font(.custom("Inter", size: 12).weight(.semibold))
-                            Spacer()
-                            Text("\(Int(workload.progress * 100))%")
-                                .font(.custom("Inter", size: 12).weight(.semibold))
-                                .foregroundColor(workload.tint)
-                        }
-                        Text("\(workload.appointments) • \(workload.minutes)")
-                            .font(.custom("Inter", size: 11))
-                            .foregroundColor(Theme.mutedForeground)
-                        ProgressBar(progress: workload.progress, tint: workload.tint)
-                    }
-                }
-            }
-            .frame(maxHeight: .infinity, alignment: .topLeading)
-        }
-    }
-}
-
-struct GroomerAverageCard: View {
-    let averages: [GroomerAverage]
-
-    var body: some View {
-        DashboardCardContainer(title: "Groomer Avg") {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Daily Metrics")
-                    .font(.custom("Inter", size: 12))
-                    .foregroundColor(Theme.mutedForeground)
-                ForEach(averages) { average in
-                    HStack {
-                        Circle()
-                            .fill(average.tint)
-                            .frame(width: 6, height: 6)
-                        Text(average.name)
-                            .font(.custom("Inter", size: 12).weight(.semibold))
-                        Spacer()
-                        VStack(alignment: .trailing, spacing: 2) {
-                            Text(average.dogsPerDay)
-                                .font(.custom("Inter", size: 12).weight(.semibold))
-                            Text("dogs/day")
-                                .font(.custom("Inter", size: 10))
-                                .foregroundColor(Theme.mutedForeground)
-                        }
-                        VStack(alignment: .trailing, spacing: 2) {
-                            Text(average.revenue)
-                                .font(.custom("Inter", size: 12).weight(.semibold))
-                                .foregroundColor(Theme.primary)
-                            Text("revenue/day")
-                                .font(.custom("Inter", size: 10))
-                                .foregroundColor(Theme.mutedForeground)
                         }
                     }
                 }
             }
-            .frame(maxHeight: .infinity, alignment: .topLeading)
-        }
-    }
-}
 
-struct ExpensesCard: View {
-    let items: [ExpenseItem]
-
-    var body: some View {
-        DashboardCardContainer(title: "Expenses") {
-            Text("January 2026")
-                .font(.custom("Inter", size: 11))
-                .foregroundColor(Theme.mutedForeground)
-            VStack(spacing: 10) {
-                ForEach(items) { item in
-                    HStack {
-                        Circle()
-                            .fill(item.tint)
-                            .frame(width: 6, height: 6)
-                        Text(item.title)
-                            .font(.custom("Inter", size: 12))
-                        Spacer()
-                        Text(item.amount)
-                            .font(.custom("Inter", size: 12).weight(.semibold))
-                        Text(item.percent)
-                            .font(.custom("Inter", size: 11))
-                            .foregroundColor(Theme.mutedForeground)
-                    }
-                }
-            }
-            .frame(maxHeight: .infinity, alignment: .topLeading)
-        }
-    }
-}
-
-struct CompletedAppointmentsCard: View {
-    var body: some View {
-        DashboardCardContainer(title: "Completed Appointments") {
-            Text("Appointment History")
-                .font(.custom("Inter", size: 11))
-                .foregroundColor(Theme.mutedForeground)
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    MetricBlock(title: "Day", value: "12")
-                    Spacer()
-                    MetricBlock(title: "Week", value: "68")
-                }
-                HStack {
-                    MetricBlock(title: "Month", value: "285")
-                    Spacer()
-                    MetricBlock(title: "Lifetime", value: "3,842", accent: Theme.primary)
-                }
-            }
-            .frame(maxHeight: .infinity, alignment: .topLeading)
-        }
-    }
-}
-
-struct BookedCapacityCard: View {
-    let items: [BookedMetric]
-
-    var body: some View {
-        DashboardCardContainer(title: "Booked %") {
-            Text("Store Capacity")
-                .font(.custom("Inter", size: 11))
-                .foregroundColor(Theme.mutedForeground)
+            SectionHeader(title: "Upcoming Appointments")
             VStack(spacing: 12) {
-                ForEach(items) { item in
-                    HStack {
-                        Text(item.label)
-                            .font(.custom("Inter", size: 12))
-                            .foregroundColor(Theme.mutedForeground)
-                        Spacer()
-                        Text(item.value)
-                            .font(.custom("Inter", size: 12).weight(.semibold))
+                ForEach(upcomingAppointments) { appointment in
+                    AppointmentCard(appointment: appointment, showsRating: false)
+                }
+            }
+
+            SectionHeader(title: "Recent Appointments")
+            VStack(spacing: 12) {
+                ForEach(recentAppointments) { appointment in
+                    AppointmentCard(appointment: appointment, showsRating: true)
+                }
+            }
+        }
+    }
+}
+
+struct AppointmentCard: View {
+    let appointment: AppointmentRow
+    let showsRating: Bool
+
+    var body: some View {
+        CardContainer {
+            HStack(alignment: .top, spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
+                        Text(appointment.clientName)
+                            .font(.custom("Inter", size: 14).weight(.semibold))
+                        OutlinePill(text: appointment.petName)
+                        if showsRating {
+                            HStack(spacing: 4) {
+                                Text(appointment.status)
+                                    .font(.custom("Inter", size: 12).weight(.semibold))
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(Theme.warning)
+                            }
+                        } else {
+                            PillBadge(text: appointment.status, tint: appointment.statusTint, textColor: Theme.primaryForeground)
+                        }
                     }
-                    ProgressBar(progress: item.progress, tint: Theme.primary)
+
+                    Text(appointment.service)
+                        .font(.custom("Inter", size: 12))
+                        .foregroundColor(Theme.mutedForeground)
+
+                    if let rating = appointment.rating {
+                        Text("\"\(rating)\"")
+                            .font(.custom("Inter", size: 11))
+                            .foregroundColor(Theme.mutedForeground)
+                    }
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 6) {
+                    Text(appointment.date)
+                        .font(.custom("Inter", size: 12).weight(.semibold))
+                    Text("\(appointment.time) • \(appointment.duration)")
+                        .font(.custom("Inter", size: 11))
+                        .foregroundColor(Theme.mutedForeground)
+                    if let amount = appointment.amount {
+                        Text(amount)
+                            .font(.custom("Inter", size: 12).weight(.semibold))
+                            .foregroundColor(Theme.primary)
+                    }
                 }
             }
-            .frame(maxHeight: .infinity, alignment: .topLeading)
         }
-    }
-}
-
-struct ClientsCard: View {
-    let items: [ClientMetric]
-
-    var body: some View {
-        DashboardCardContainer(title: "Clients") {
-            Text("Client Metrics")
-                .font(.custom("Inter", size: 11))
-                .foregroundColor(Theme.mutedForeground)
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(items) { item in
-                    MetricBlock(title: item.title, value: item.value)
-                }
-            }
-            .frame(maxHeight: .infinity, alignment: .topLeading)
-        }
-    }
-}
-
-struct MetricBlock: View {
-    let title: String
-    let value: String
-    var accent: Color = Theme.foreground
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.custom("Inter", size: 11))
-                .foregroundColor(Theme.mutedForeground)
-            Text(value)
-                .font(.custom("Inter", size: 18).weight(.bold))
-                .foregroundColor(accent)
-        }
-    }
-}
-
-struct ProgressBar: View {
-    let progress: Double
-    let tint: Color
-
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Theme.muted)
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(tint)
-                    .frame(width: geometry.size.width * progress)
-            }
-        }
-        .frame(height: 8)
-    }
-}
-
-struct DividerLine: View {
-    var body: some View {
-        Rectangle()
-            .fill(Theme.border)
-            .frame(height: 1)
     }
 }
