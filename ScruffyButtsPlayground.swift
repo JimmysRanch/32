@@ -1,7 +1,4 @@
 import SwiftUI
-#if canImport(PlaygroundSupport)
-import PlaygroundSupport
-#endif
 
 struct OKLCHColor {
     let l: Double
@@ -412,7 +409,3 @@ struct Pill: View {
             .cornerRadius(999)
     }
 }
-
-#if canImport(PlaygroundSupport)
-PlaygroundPage.current.setLiveView(ContentView().frame(minWidth: 1200, minHeight: 900))
-#endif
